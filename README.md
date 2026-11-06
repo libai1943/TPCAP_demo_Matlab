@@ -1,7 +1,8 @@
 # TPCAP Parking Benchmarks — MATLAB Demo
 
+[Download ZIP](https://github.com/libai1943/TPCAP_demo_Matlab/archive/refs/heads/main.zip) · [Getting started](#quick-start) · [Guide](#file-and-function-guide) · [Citation](#citation)
 
-**Twenty parking scenes. One small starting point for your planner.** This is the original benchmark-loading and visualization demo for the **Trajectory Planning Competition of Automated Parking (TPCAP)**, organized with IEEE ITSC 2022.
+**Open a parking scene in MATLAB and inspect the exact vertices your collision checker will receive.** This is the original benchmark-loading and visualization demo for the **Trajectory Planning Competition of Automated Parking (TPCAP)**, organized with IEEE ITSC 2022.
 
 TPCAP focused on the planning module: participants submitted trajectories for evaluation without having to implement perception, localization, or vehicle tracking. The preliminary round ran from June 5 to September 12, 2022, and the final round took place on October 10–11, 2022. This repository preserves the **20 preliminary-round scenes** as a reusable research and teaching resource.
 
@@ -32,6 +33,20 @@ V = readmatrix(fullfile(pwd, 'BenchmarkCases', ...
 ```
 
 The figures show obstacles, heading arrows, and initial/goal vehicle rectangles. The original MATLAB colors are green for the initial outline and red for the goal outline. The script **does not call a trajectory planner, optimizer, or competition scoring service**.
+
+### Inspect the polygons in the workspace
+
+Set the loop to `for id = 11` and run the script once. Its global structure then holds the five polygons from [Case 11](BenchmarkCases/Case11.csv). The CSV stores 5, 4, 6, 5 and 5 vertices. `LoadCase` appends the first vertex of each polygon so that its contour is closed.
+
+```matlab
+global params_
+n = cellfun(@(p) numel(p.x)-1, params_.obstacle.obs);
+assert(isequal(n, [5 4 6 5 5]))
+P = params_.obstacle.obs{3};
+vertices = [P.x(1:end-1).' P.y(1:end-1).'];   % six distinct vertices
+```
+
+The loop replaces `params_` at each iteration. Inspect a single case as above, or run your own planner inside the loop immediately after `LoadCase()`.
 
 ## File and function guide
 
@@ -65,6 +80,8 @@ The sample vehicle has a 2.8 m wheelbase, 0.96 m front overhang, 0.929 m rear ov
 To build a planner on top of the demo, read the initial/goal poses and obstacles, formulate your vehicle dynamics and collision constraints, then compute and evaluate a trajectory. Plotting a scene does not check feasibility or compute a competition score. The paper is the reference for the historical competition's rules and evaluation; this repository is the scene-loading demonstration.
 
 ## Related resources
+
+- [Benchmark archive and case-selection guide](https://github.com/libai1943/TPCAP_benchmarks).
 
 - [Python version of the same scene demo](https://github.com/libai1943/TPCAP_demo_Python).
 - [TPCAP GitHub organization](https://github.com/TPCAP).
